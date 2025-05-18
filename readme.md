@@ -1,0 +1,3 @@
+``` bash
+cc hello.c
+```
