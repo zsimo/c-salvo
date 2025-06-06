@@ -5,9 +5,16 @@ int sum (int a, int b) {
     return result;
 }
 
+void incr (void) {
+    int x = 1;
+    x += 1;
+    printf("%d\n", x);
+}
+
 int main (void) {
     printf("Hello\n");
     printf("%d\n", sum(1, 2));
+    incr();
     return 0;
 }
 
