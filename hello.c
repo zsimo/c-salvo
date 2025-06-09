@@ -9,6 +9,7 @@ void incr (void) {
     int x = 1;
     x += 1;
     printf("%d\n", x);
+    printf("sizeof %d bytes %d\n", x, (int)sizeof(x));
 }
 
 int main (void) {
