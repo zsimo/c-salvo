@@ -6,5 +6,5 @@ Some excercise following the Salvatore Sanfilippo [c course](https://www.youtube
 cc hello.c
 cc -O2 hello.c
 # warning
-cc -W -Wall hello.c
+cc -W -Wall -O2 hello.c
 ```
