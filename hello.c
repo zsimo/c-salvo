@@ -14,6 +14,7 @@ void incr (void) {
 
 void array () {
     int a[2] = {1, 2};
+    // in c le stringhe sono array ti tipo char
     char str[] = "simo";
      printf("%s\n%d\n", str, a[0]);
 }
