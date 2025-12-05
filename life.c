@@ -2,6 +2,7 @@
 
 #define GRID_COLS 25
 #define GRID_ROWS 25
+#define GRID_CELLS (GRID_COLS * GRID_ROWS)
 #define ALIVE '*'
 #define DEAD '.'
 
@@ -51,9 +52,11 @@ void set_grid (char *grid, char state) {
     }
 }
 int main (void) {
-    char grid[GRID_COLS * GRID_ROWS];
-    set_grid(grid, ALIVE);
-    print_grid(grid);
+    char old_grid[GRID_CELLS];
+    char new_grid[GRID_CELLS];
+    set_grid(old_grid, DEAD);
+    set_cell(old_grid, 10, 10, ALIVE);
+    print_grid(old_grid);
     return 0;
 }
 
