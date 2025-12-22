@@ -93,22 +93,28 @@ int main (void) {
     char old_grid[GRID_CELLS];
     char new_grid[GRID_CELLS];
     set_grid(old_grid, DEAD);
-//    set_cell(old_grid, 10, 10, ALIVE);
-//    set_cell(old_grid, 10, 11, ALIVE);
-//    set_cell(old_grid, 10, 12, ALIVE);
-
     set_cell(old_grid, 10, 10, ALIVE);
     set_cell(old_grid, 9, 10, ALIVE);
     set_cell(old_grid, 11, 10, ALIVE);
     set_cell(old_grid, 11, 9, ALIVE);
     set_cell(old_grid, 10, 8, ALIVE);
+
+    char *old = old_grid;
+    char *new = new_grid;
+
     while (1) {
-        compute_new_state(old_grid, new_grid);
-        print_grid(new_grid);
+        compute_new_state(old, new);
+        print_grid(new);
         usleep(100000);
-        compute_new_state(new_grid, old_grid);
-        print_grid(old_grid);
-        usleep(100000);
+
+        // swap of the pointers
+        char *tmp = old;
+        old = new;
+        new = tmp;
+
+//        compute_new_state(new_grid, old_grid);
+//        print_grid(old_grid);
+//        usleep(100000);
     }
 
     return 0;

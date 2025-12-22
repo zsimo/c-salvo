@@ -12,5 +12,4 @@ cc -W -Wall -O2 hello.c
 
 
 #### todo:
-[lesson09](https://www.youtube.com/watch?v=lc7hL9Wt-ho&list=PLrEMgOSrS_3cFJpM2gdw8EGFyRBZOyAKY&index=11) 
-5:28
+[lesson12](https://www.youtube.com/watch?v=ZkaKwWXJXs8&list=PLrEMgOSrS_3cFJpM2gdw8EGFyRBZOyAKY&index=13) 
