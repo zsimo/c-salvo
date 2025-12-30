@@ -44,8 +44,11 @@ uint32_t ps_len(char *s) {
     return *lenptr;
 }
 
+char *global_string;
+
 int main (void) {
     char *mystr = ps_create("Hello World", 11);
+    global_string = mystr;
     ps_print(mystr);
     ps_print(mystr);
     printf("%s %d\n", mystr, (int)ps_len(mystr));
