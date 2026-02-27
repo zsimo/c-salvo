@@ -78,12 +78,14 @@ tfobj * createBoolObject (int i) {
     o->i = i;
     return o;
 }
-tfobj * createListObject (int i) {
+tfobj * createListObject (void) {
     tfobj *o = createObject(TFOBJ_TYPE_LIST);
     o->list.ele = NULL;
     o->list.len = 0;
     return o;
 }
+/* ===================== Turn program into toy forth  list ===================*/
+
 
 /* ================================ Main =====================================*/
 
@@ -95,5 +97,24 @@ int main (int argc, char **argv) {
     }
 
     printf("%s %d\n", argv[0], argc);
+
+    /* Read the program in memory for later parsing. */
+    FILE *fp = fopen(argv[1], "r");
+    if (fp == NULL) {
+        perror("Opening Toy Forth program");
+        exit(1);
+    }
+    fseek(fp, 0, SEEK_END);
+    long file_size = ftell(fp);
+    char *prgtext = xmalloc(file_size+1);
+    fseek(fp, 0, SEEK_SET);
+    fread(prgtext, file_size, 1, fp);
+    prgtext[file_size] = 0;
+    fclose(fp);
+
+    printf("Program text: %s\n", prgtext);
+//    tfobj *prg = compile(argv[1]);
+//    exec(prftext);
+
     return 0;
 }
