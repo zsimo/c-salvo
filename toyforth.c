@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #define TFOBJ_TYPE_INT 0
 #define TFOBJ_TYPE_STR 1
@@ -86,6 +87,26 @@ tfobj * createListObject (void) {
 }
 /* ===================== Turn program into toy forth  list ===================*/
 
+void parserSkipSpaces(tfparser *parser) {
+
+    while (isspace(parser->p[0])) {
+         parser->p ++;
+    }
+
+}
+
+tfobj *compile(char *prg) {
+    tfparser parser;
+    parser.prg = prg;
+    parser.p = prg;
+
+    while (parser.p) {
+        parserSkipSpaces($parser);
+        if (isdigit(parser->p[0]) || parser->p[0] == '-') {
+
+        }
+    }
+}
 
 /* ================================ Main =====================================*/
 
