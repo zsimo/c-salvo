@@ -79,15 +79,28 @@ tfobj * createBoolObject (int i) {
     o->i = i;
     return o;
 }
+
+/* =============================== List object ===============================*/
 tfobj * createListObject (void) {
     tfobj *o = createObject(TFOBJ_TYPE_LIST);
     o->list.ele = NULL;
     o->list.len = 0;
     return o;
 }
+/* Add the new element at the end of the list 'list' */
+void listPush (tfobj *l, tfobj ele) {
+
+}
 /* ===================== Turn program into toy forth  list ===================*/
 
-void parserSkipSpaces(tfparser *parser) {
+void parseSpaces(tfparser *parser) {
+
+    while (isspace(parser->p[0])) {
+         parser->p ++;
+    }
+
+}
+void parseNumbers(tfparser *parser) {
 
     while (isspace(parser->p[0])) {
          parser->p ++;
@@ -100,10 +113,30 @@ tfobj *compile(char *prg) {
     parser.prg = prg;
     parser.p = prg;
 
-    while (parser.p) {
-        parserSkipSpaces($parser);
-        if (isdigit(parser->p[0]) || parser->p[0] == '-') {
+    tfobj *parsed = createListObject();
 
+    while (parser.p) {
+        tfobj *o;
+        char token_start = parser.p;
+
+        parserSkipSpaces($parser);
+
+        if (parser.p[0] == 0) {
+            break; // end of program reached
+        }
+
+        if (isdigit(parser.p[0]) || parser.p[0] == '-') {
+            o = parseNumbers($parser);
+        } else {
+            o = NULL;
+        }
+
+        // check if the current token produced a parsing error.
+        if (o == NULL) {
+            printf("Syntax error near: %32s ... \n", token_start);
+            return NULL;
+        } else {
+            listPush(parsed, o);
         }
     }
 }
