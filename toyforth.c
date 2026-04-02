@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <string.h>
 
 #define TFOBJ_TYPE_INT 0
 #define TFOBJ_TYPE_STR 1
@@ -99,16 +100,36 @@ void listPush (tfobj *l, tfobj *ele) {
 void parseSpaces(tfparser *parser) {
 
     while (isspace(parser->p[0])) {
-         parser->p ++;
+         parser->p++;
     }
 
 }
-void parseNumbers(tfparser *parser) {
 
-    while (isspace(parser->p[0])) {
-         parser->p ++;
+#define MAX_NUM_LEN 128
+tfobj *parseNumbers(tfparser *parser) {
+
+    char buf[MAX_NUM_LEN];
+    char *start = parser->p;
+    char *end;
+    if (parser->p[0] == '-') {
+        parser->p++;
     }
 
+    while (parser->p[0] && isdigit(parser->p[0])) {
+         parser->p++;
+    }
+
+   end = parser->p;
+   int numlen = end - start;
+   if (numlen >= MAX_NUM_LEN) {
+        return NULL;
+   }
+
+   memcpy(buf, start, numlen);
+   buf[numlen] = 0;
+
+   tfobj *o = createIntObject(atoi(buf));
+   return o;
 }
 
 tfobj *compile(char *prg) {
@@ -142,6 +163,8 @@ tfobj *compile(char *prg) {
             listPush(parsed, o);
         }
     }
+
+    return parsed;
 }
 
 /* ================================ Main =====================================*/
