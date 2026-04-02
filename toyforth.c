@@ -89,7 +89,7 @@ tfobj * createListObject (void) {
 }
 /* Add the new element at the end of the list 'list'
  * It is up to the caller to increment the reference count of the element added if needed. */
-void listPush (tfobj *l, tfobj ele) {
+void listPush (tfobj *l, tfobj *ele) {
     l->list.ele = realloc(l->list.ele, sizeof(tfobj*) * (l->list.len + 1));
     l->list.ele[l->list.len] = ele;
     l->list.len++;
@@ -120,16 +120,16 @@ tfobj *compile(char *prg) {
 
     while (parser.p) {
         tfobj *o;
-        char token_start = parser.p;
+        char *token_start = parser.p;
 
-        parserSkipSpaces($parser);
+        parseSpaces(&parser);
 
         if (parser.p[0] == 0) {
             break; // end of program reached
         }
 
         if (isdigit(parser.p[0]) || parser.p[0] == '-') {
-            o = parseNumbers($parser);
+            o = parseNumbers(&parser);
         } else {
             o = NULL;
         }
