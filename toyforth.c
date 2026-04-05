@@ -157,6 +157,7 @@ tfobj *compile(char *prg) {
 
         // check if the current token produced a parsing error.
         if (o == NULL) {
+            // FIXME: release parsed here
             printf("Syntax error near: %32s ... \n", token_start);
             return NULL;
         } else {
@@ -165,6 +166,24 @@ tfobj *compile(char *prg) {
     }
 
     return parsed;
+}
+
+/* ======================== Execute the program ==============================*/
+void exec (tfobj *prg) {
+    printf("[");
+    for (size_t j = 0; j < prg->list.len; j++) {
+        tfobj *o = prg->list.ele[j];
+        switch (o->type) {
+            case TFOBJ_TYPE_INT:
+                printf("%d", o->i);
+                break;
+            default:
+                printf("?");
+                break;
+        }
+        printf(" ");
+    }
+    printf("]\n");
 }
 
 /* ================================ Main =====================================*/
@@ -193,8 +212,8 @@ int main (int argc, char **argv) {
     fclose(fp);
 
     printf("Program text: %s\n", prgtext);
-//    tfobj *prg = compile(argv[1]);
-//    exec(prftext);
+    tfobj *prg = compile(prgtext);
+    exec(prg);
 
     return 0;
 }
