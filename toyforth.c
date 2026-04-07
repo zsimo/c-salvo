@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
+#include <assert.h>
 
 #define TFOBJ_TYPE_INT 0
 #define TFOBJ_TYPE_STR 1
@@ -203,7 +204,10 @@ void print_obj (tfobj *o) {
             for (size_t j = 0; j < o->list.len; j++) {
                 tfobj *ele = o->list.ele[j];
                 print_obj(ele);
-                printf(" ");
+                if (j != o->list.len - 1) {
+                    printf(" ");
+                }
+
             }
             printf("]");
         break;
@@ -215,6 +219,10 @@ void print_obj (tfobj *o) {
         break;
     }
 
+}
+
+void exec (tfobj *prg) {
+    assert(prg->type == TFOBJ_TYPE_LIST);
 }
 
 /* ================================ Main =====================================*/
