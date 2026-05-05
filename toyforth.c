@@ -49,6 +49,14 @@ void *xmalloc (size_t size) {
     }
     return ptr;
 }
+void *xrealloc (void *oldptr, size_t size) {
+    void *ptr = realloc(oldptr, size);
+    if (ptr == NULL) {
+        fprintf(stderr, "Out of memory allocating %zu bytes\n", size);
+        exit(1);
+    }
+    return ptr;
+}
 
 /* ====================== Object related functions ===========================
  * The following functions allocate Toy Forth objects of different types.
@@ -94,7 +102,7 @@ tfobj * createListObject (void) {
 /* Add the new element at the end of the list 'list'
  * It is up to the caller to increment the reference count of the element added if needed. */
 void listPush (tfobj *l, tfobj *ele) {
-    l->list.ele = realloc(l->list.ele, sizeof(tfobj*) * (l->list.len + 1));
+    l->list.ele = xrealloc(l->list.ele, sizeof(tfobj*) * (l->list.len + 1));
     l->list.ele[l->list.len] = ele;
     l->list.len++;
 }
@@ -194,7 +202,7 @@ tfobj *compile(char *prg) {
 }
 
 /* ======================== Execute the program ==============================*/
-void print_obj (tfobj *o) {
+void printObj (tfobj *o) {
     switch (o->type) {
         case TFOBJ_TYPE_INT:
             printf("%d", o->i);
@@ -203,11 +211,10 @@ void print_obj (tfobj *o) {
             printf("[");
             for (size_t j = 0; j < o->list.len; j++) {
                 tfobj *ele = o->list.ele[j];
-                print_obj(ele);
+                printObj(ele);
                 if (j != o->list.len - 1) {
                     printf(" ");
                 }
-
             }
             printf("]");
         break;
@@ -220,9 +227,31 @@ void print_obj (tfobj *o) {
     }
 
 }
+/* ================================ Execution and context =====================================*/
 
-void exec (tfobj *prg) {
+tfctx *createContext(void) {
+    tfctx *ctx = xmalloc(sizeof(*ctx));
+    ctx->stack = createListObject();
+    return ctx;
+}
+
+void exec (tfctx *ctx, tfobj *prg) {
     assert(prg->type == TFOBJ_TYPE_LIST);
+
+    for (size_t j = 0; j < prg->list.len; j++) {
+        tfobj *word = prg->list.ele[j];
+//        printObj(word);
+//        if (j != o->list.len - 1) {
+//            printf(" ");
+//        }
+        switch (word->type) {
+            case TFOBJ_TYPE_SYMBOL:
+            break;
+            default:
+            listPush(ctx->stack, word);
+            break;
+        }
+    }
 }
 
 /* ================================ Main =====================================*/
@@ -252,8 +281,13 @@ int main (int argc, char **argv) {
 
     printf("Program text: %s\n", prgtext);
     tfobj *prg = compile(prgtext);
-    print_obj(prg);
+    printObj(prg);
     printf("\n");
+    tfctx *ctx = createContext();
+    exec(ctx, prg);
 
+    printf("Stack content at end:");
+    printObj(ctx->stack);
+    printf("\n");
     return 0;
 }

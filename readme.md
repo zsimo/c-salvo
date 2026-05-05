@@ -8,8 +8,9 @@ cc -O2 hello.c
 # warning
 cc -W -Wall -O2 hello.c
 ./a.out
+./a.out program.tf
 ```
 
 
 #### todo:
-[lesson26](https://www.youtube.com/watch?v=oMj3N6jYIUU&list=PLrEMgOSrS_3cFJpM2gdw8EGFyRBZOyAKY&index=29) 8:00
+[lesson26](https://www.youtube.com/watch?v=oMj3N6jYIUU&list=PLrEMgOSrS_3cFJpM2gdw8EGFyRBZOyAKY&index=29) 18:00
