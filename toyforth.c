@@ -92,6 +92,17 @@ tfobj * createBoolObject (int i) {
     return o;
 }
 
+void retain (tfobj *o) {
+    o->refcount ++;
+}
+void release (tfobj *o) {
+    assert(o->refcount > 0);
+    o->refcount --;
+    if (o->refcount == 0) {
+        freeObject(o);
+    }
+}
+
 /* =============================== List object ===============================*/
 tfobj * createListObject (void) {
     tfobj *o = createObject(TFOBJ_TYPE_LIST);
@@ -235,6 +246,28 @@ tfctx *createContext(void) {
     return ctx;
 }
 
+/** Function table entry: each of this entry represents a symbol name
+ associated with a function implementation. */
+struct FunctionTableEntry{
+    tfobj *name;
+    void (*callback)(tfctx *ctx, tfobj *name);
+    tfobj *user_list;
+};
+struct {
+
+} FunctionTable[] = {
+
+};
+
+/** Try to resolve and call the function associated with the symbol named
+    'word'. Return '0' if the symbol was actually bound to some function,
+    return '1' otherwise.
+*/
+int callSymbol (tfctx *ctx, tfobj *word) {
+
+}
+
+/** Execute the Toy Forth program stored into the list 'prg'.*/
 void exec (tfctx *ctx, tfobj *prg) {
     assert(prg->type == TFOBJ_TYPE_LIST);
 
@@ -246,9 +279,11 @@ void exec (tfctx *ctx, tfobj *prg) {
 //        }
         switch (word->type) {
             case TFOBJ_TYPE_SYMBOL:
+                callSymbol(ctx, word);
             break;
             default:
             listPush(ctx->stack, word);
+            retain(word);
             break;
         }
     }
