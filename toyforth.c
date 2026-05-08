@@ -36,8 +36,23 @@ typedef struct tfparser {
 } tfparser;
 
 
+
+/** Function table entry: each of this entry represents a symbol name
+ associated with a function implementation. */
+struct FunctionTableEntry{
+    tfobj *name;
+    void (*callback)(tfctx *ctx, tfobj *name);
+    tfobj *user_list;
+};
+struct FunctionTable = {
+    struct FunctionTableEntry **func_table;
+    size_t func_count;
+};
+
+/** Our execution context. */
 typedef struct tfctx {
     tfobj *stack;
+    struct FunctionTable functable;
 } tfctx;
 
 /* ========================= Allocation wrappers =============================*/
@@ -92,6 +107,25 @@ tfobj * createBoolObject (int i) {
     return o;
 }
 
+/** Free an object and all other nexted objects. */
+void freeObject (tfobj *o) {
+    switch (o->type) {
+        case TFOBJ_TYPE_LIST:
+            for (size_t j = 0; j < o->list.len; j++) {
+                tfobj *ele = o->list.ele[j];
+                release(ele);
+            }
+        break;
+        case TFOBJ_TYPE_SYMBOL:
+        case TFOBJ_TYPE_STR:
+            free(o->str.ptr);
+        break;
+        default:
+        break;
+    }
+    free(o);
+
+}
 void retain (tfobj *o) {
     o->refcount ++;
 }
@@ -101,6 +135,35 @@ void release (tfobj *o) {
     if (o->refcount == 0) {
         freeObject(o);
     }
+}
+
+void printObj (tfobj *o) {
+    switch (o->type) {
+        case TFOBJ_TYPE_INT:
+            printf("%d", o->i);
+        break;
+        case TFOBJ_TYPE_LIST:
+            printf("[");
+            for (size_t j = 0; j < o->list.len; j++) {
+                tfobj *ele = o->list.ele[j];
+                printObj(ele);
+                if (j != o->list.len - 1) {
+                    printf(" ");
+                }
+            }
+            printf("]");
+        break;
+        case TFOBJ_TYPE_STR:
+            printf("\"%s\"", o->str.ptr);
+        break;
+        case TFOBJ_TYPE_SYMBOL:
+            printf("%s", o->str.ptr);
+        break;
+        default:
+            printf("?");
+        break;
+    }
+
 }
 
 /* =============================== List object ===============================*/
@@ -201,8 +264,8 @@ tfobj *compile(char *prg) {
 
         // check if the current token produced a parsing error.
         if (o == NULL) {
-            // FIXME: release parsed here
             printf("Syntax error near: %32s ... \n", token_start);
+            release(parsed);
             return NULL;
         } else {
             listPush(parsed, o);
@@ -211,53 +274,17 @@ tfobj *compile(char *prg) {
 
     return parsed;
 }
-
-/* ======================== Execute the program ==============================*/
-void printObj (tfobj *o) {
-    switch (o->type) {
-        case TFOBJ_TYPE_INT:
-            printf("%d", o->i);
-        break;
-        case TFOBJ_TYPE_LIST:
-            printf("[");
-            for (size_t j = 0; j < o->list.len; j++) {
-                tfobj *ele = o->list.ele[j];
-                printObj(ele);
-                if (j != o->list.len - 1) {
-                    printf(" ");
-                }
-            }
-            printf("]");
-        break;
-        case TFOBJ_TYPE_SYMBOL:
-            printf("%s", o->str.ptr);
-        break;
-        default:
-            printf("?");
-        break;
-    }
-
-}
 /* ================================ Execution and context =====================================*/
 
 tfctx *createContext(void) {
     tfctx *ctx = xmalloc(sizeof(*ctx));
     ctx->stack = createListObject();
+    ctx->functable.func_table = NULL;
+    ctx->functable.func_count = 0;
+    registerFunction(ctx, "+", basicMathFunctions);
     return ctx;
 }
 
-/** Function table entry: each of this entry represents a symbol name
- associated with a function implementation. */
-struct FunctionTableEntry{
-    tfobj *name;
-    void (*callback)(tfctx *ctx, tfobj *name);
-    tfobj *user_list;
-};
-struct {
-
-} FunctionTable[] = {
-
-};
 
 /** Try to resolve and call the function associated with the symbol named
     'word'. Return '0' if the symbol was actually bound to some function,
